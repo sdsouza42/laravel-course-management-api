@@ -1,0 +1,195 @@
+openapi: 3.0.3
+info:
+  title: Course API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000/api/v1
+paths:
+  /courses:
+    get:
+      summary: List courses
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search by course name and description.
+      responses:
+        '200':
+          description: Courses returned successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+    post:
+      summary: Create a course
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseCreateOrUpdate'
+      responses:
+        '201':
+          description: Course created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '422':
+          description: Validation failed.
+  /courses/{course}:
+    parameters:
+      - in: path
+        name: course
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Get one course
+      responses:
+        '200':
+          description: Course returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '404':
+          description: Course not found.
+    put:
+      summary: Update one course
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseCreateOrUpdate'
+      responses:
+        '200':
+          description: Course updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '404':
+          description: Course not found.
+        '422':
+          description: Validation failed.
+    delete:
+      summary: Soft delete one course
+      responses:
+        '204':
+          description: Course deleted successfully.
+        '404':
+          description: Course not found.
+  /courses/bulk-delete:
+    delete:
+      summary: Bulk soft delete courses
+      parameters:
+        - in: query
+          name: ids
+          required: true
+          schema:
+            type: string
+          description: Comma-separated list of IDs (example: 1,2,3)
+      responses:
+        '204':
+          description: All course IDs found and deleted.
+        '200':
+          description: Partial success with missing IDs.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted_ids:
+                    type: array
+                    items:
+                      type: integer
+                  not_found_ids:
+                    type: array
+                    items:
+                      type: integer
+        '404':
+          description: No IDs were found.
+  /courses/bulk-update:
+    put:
+      summary: Bulk update courses
+      parameters:
+        - in: query
+          name: ids
+          required: true
+          schema:
+            type: string
+          description: Comma-separated list of IDs (example: 1,2,3)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                price_cents:
+                  type: integer
+      responses:
+        '200':
+          description: At least one course updated. Missing IDs are included if any.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated_ids:
+                    type: array
+                    items:
+                      type: integer
+                  not_found_ids:
+                    type: array
+                    items:
+                      type: integer
+        '404':
+          description: No IDs were found.
+        '422':
+          description: Validation failed.
+components:
+  schemas:
+    Course:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        price_cents:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+    CourseCreateOrUpdate:
+      type: object
+      required:
+        - name
+        - description
+        - price_cents
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price_cents:
+          type: integer
