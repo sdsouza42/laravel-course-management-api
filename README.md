@@ -19,7 +19,7 @@ This project explores backend application architecture, API design, database ope
 
 - PHP 8.2+ / Laravel 12
 - Eloquent ORM
-- SQLite (default local configuration)
+- MySQL (default local configuration)
 - PHPUnit
 - Laravel Pint
 - GitHub Actions
@@ -57,7 +57,7 @@ See [openapi.yaml](openapi.yaml) for the complete API specification.
 
 ### Requirements
 
-PHP, Composer, SQLite support, and a compatible local development environment. Node.js and npm are needed when building frontend assets.
+PHP, Composer, MySQL support, and a compatible local development environment. Node.js and npm are needed when building frontend assets.
 
 ### Setup
 
@@ -72,7 +72,7 @@ php artisan migrate
 php artisan serve
 ```
 
-If the SQLite database file is absent, create `database/database.sqlite` before running migrations.
+If the MySQL database file is absent, create `database/database.MySQL` before running migrations.
 
 The project includes Laravel Livewire/Flux starter-kit dependencies. Installing these may require appropriate Flux credentials.
 
