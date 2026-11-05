@@ -1,30 +1,122 @@
-# Laravel + Livewire Starter Kit
+# Course Management REST API
 
-## Introduction
+A RESTful API built with **Laravel 12 and PHP** for managing course records, featuring CRUD operations, bulk processing, request validation, caching, and automated testing.
 
-Our Laravel + [Livewire](https://livewire.laravel.com) starter kit provides a robust, modern starting point for building Laravel applications with a Livewire frontend.
+This project explores backend application architecture, API design, database operations, and maintainable server-side development.
 
-Livewire is a powerful way of building dynamic, reactive, frontend UIs using just PHP. It's a great fit for teams that primarily use Blade templates and are looking for a simpler alternative to JavaScript-driven SPA frameworks like React and Vue.
+## Features
 
-This Livewire starter kit utilizes Livewire 4, TypeScript, Tailwind, and the [Flux UI](https://fluxui.dev) component library.
+- **RESTful API:** Versioned `/api/v1` endpoints for creating, retrieving, updating, and deleting courses.
+- **Bulk Operations:** Update or soft-delete multiple courses in a single request, with partial-success reporting.
+- **Request Validation:** Laravel Form Requests validate input and return appropriate HTTP error responses.
+- **Database Integration:** Eloquent ORM, database migrations, and soft deletes.
+- **Caching:** Cache-aside strategy using Laravel's cache facade, with version-based invalidation.
+- **Automated Tests:** PHPUnit unit and feature tests covering CRUD operations, validation, bulk processing, and cache behavior.
+- **CI:** GitHub Actions workflows for automated testing and PHP code formatting checks.
+- **API Documentation:** OpenAPI 3.0 specification.
 
-If you are looking for the alternate configurations of this starter kit, they can be found in the following branches:
+## Technology Stack
 
-- [components](https://github.com/laravel/livewire-starter-kit/tree/components) - if Volt is not selected
-- [workos](https://github.com/laravel/livewire-starter-kit/tree/workos) - if WorkOS is selected for authentication
+- PHP 8.2+ / Laravel 12
+- Eloquent ORM
+- SQLite (default local configuration)
+- PHPUnit
+- Laravel Pint
+- GitHub Actions
+- OpenAPI 3.0
 
-## Official Documentation
+## Architecture
 
-Documentation for all Laravel starter kits can be found on the [Laravel website](https://laravel.com/docs/starter-kits).
+The application separates HTTP handling from business logic.
 
-## Contributing
+- **CourseController:** Processes HTTP requests and builds API responses.
+- **CourseService:** Implements course operations, database queries, search, and caching.
+- **Course Model:** Represents course records using Eloquent, including soft deletion.
+- **Form Requests:** Validate incoming data before passing it to the service layer.
+- **CourseObserver:** Invalidates cached course data following database changes.
 
-Thank you for considering contributing to our starter kit! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+The API uses versioned cache keys to invalidate previously cached results following create, update, and delete operations.
 
-## Code of Conduct
+## API Endpoints
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+All endpoints use the prefix `/api/v1`.
 
-## License
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/courses` | List courses, optionally filtered using `?search=` |
+| GET | `/courses/{id}` | Retrieve a course |
+| POST | `/courses` | Create a course |
+| PUT | `/courses/{id}` | Update a course |
+| DELETE | `/courses/{id}` | Soft-delete a course |
+| PUT | `/courses/bulk-update?ids=1,2` | Update multiple courses |
+| DELETE | `/courses/bulk-delete?ids=1,2` | Soft-delete multiple courses |
 
-The Laravel + Livewire starter kit is open-sourced software licensed under the MIT license.
+See [openapi.yaml](openapi.yaml) for the complete API specification.
+
+## Running Locally
+
+### Requirements
+
+PHP, Composer, SQLite support, and a compatible local development environment. Node.js and npm are needed when building frontend assets.
+
+### Setup
+
+```bash
+git clone https://github.com/sdsouza42/Article-Management-System---Laravel-REST-API.git
+cd Article-Management-System---Laravel-REST-API
+
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan serve
+```
+
+If the SQLite database file is absent, create `database/database.sqlite` before running migrations.
+
+The project includes Laravel Livewire/Flux starter-kit dependencies. Installing these may require appropriate Flux credentials.
+
+### Example Request
+
+Create a course:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/courses \
+  -H "Content-Type: application/json" \
+  -d '{"name":"PHP Fundamentals","description":"Introduction to PHP","price_cents":4999}'
+```
+
+Retrieve courses:
+
+```bash
+curl http://localhost:8000/api/v1/courses
+```
+
+## Testing
+
+Run the PHPUnit suite with:
+
+```bash
+php artisan test
+```
+
+Run PHP formatting checks with:
+
+```bash
+composer test:lint
+```
+
+GitHub Actions is configured to run automated tests and formatting checks.
+
+## Current Limitations
+
+- The API is intended as a learning and portfolio project.
+- API routes currently do not enforce user authentication or authorization.
+- The project has not been hardened for public production deployment.
+
+## Future Improvements
+
+- Add API authentication and access controls.
+- Introduce pagination for large course collections.
+- Improve deployment and environment configuration.
+- Expand documentation and integration testing.
